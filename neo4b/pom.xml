@@ -4,4 +4,7 @@
   <artifactId>neo4b</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <modules>
+  	<module>neo4b-server</module>
+  </modules>
 </project>
