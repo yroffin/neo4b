@@ -18,6 +18,8 @@ package org.yroffin.neo4b.components;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,6 +40,8 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.yroffin.neo4b.exception.NotFoundException;
+import org.yroffin.neo4b.exception.TechnicalException;
 import org.yroffin.neo4b.model.rest.neo4j.Neo4jRequest;
 import org.yroffin.neo4b.model.rest.neo4j.Neo4jResponse;
 import org.yroffin.neo4b.model.rest.neo4j.cypher.Neo4jData;
@@ -214,20 +218,51 @@ public class GraphDbService extends DefaultService {
 	public <T> List<T> cypherFind(WebTarget webTarget, String cypher, Class<T> klass) {
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		List<T> results = new ArrayList<T>();
+		logger.info("Cypher:{}", cypher.toString());
 		Neo4jResponse cyphers = cypher(webTarget, cypher);
 		for (Neo4jResult item : cyphers.getResults()) {
 			for (Neo4jData data : item.getData()) {
+				T current = null;
+				int index = 0;
 				for (Object row : data.getRow()) {
-					try {
-						results.add((T) mapper.readValue(row.toString(), klass));
-						logger.info("Entity:{}", row.toString());
-					} catch (IOException e) {
-						e.printStackTrace();
+					if (item.getColumns().get(index).startsWith("id(")) {
+						try {
+							Method m = current.getClass().getMethod("setId", String.class);
+							m.invoke(current, row.toString());
+						} catch (NoSuchMethodException | SecurityException | IllegalAccessException
+								| IllegalArgumentException | InvocationTargetException e) {
+							throw new TechnicalException(e);
+						}
+					} else {
+						try {
+							current = mapper.readValue(row.toString(), klass);
+							results.add((T) current);
+							logger.info("Entity:{}", row.toString());
+						} catch (IOException e) {
+							throw new TechnicalException(e);
+						}
 					}
+					index++;
 				}
 			}
 		}
 		return results;
+	}
+
+	/**
+	 * finder, only one
+	 * 
+	 * @param webTarget
+	 * @param cypher
+	 * @param klass
+	 * @return
+	 */
+	public <T> T cypherOne(WebTarget webTarget, String cypher, Class<T> klass) {
+		List<T> items = cypherFind(webTarget, cypher, klass);
+		if (items.size() > 0) {
+			return items.get(0);
+		}
+		throw new NotFoundException(cypher);
 	}
 
 	/**
@@ -240,5 +275,34 @@ public class GraphDbService extends DefaultService {
 	public <T> List<T> findAll(WebTarget client, Class<T> klass, int limit) {
 		return cypherFind(client,
 				"MATCH (" + klass.getSimpleName() + ") RETURN " + klass.getSimpleName() + " LIMIT " + limit, klass);
+	}
+
+	/**
+	 * find all filtering by label
+	 * 
+	 * @param client
+	 * @param klass
+	 * @param label
+	 * @param limit
+	 * @return
+	 */
+	public <T> List<T> findAll(WebTarget client, Class<T> klass, String label, int limit) {
+		return cypherFind(client, "MATCH (" + klass.getSimpleName() + ":" + label + ") RETURN " + klass.getSimpleName()
+				+ " LIMIT " + limit, klass);
+	}
+
+	/**
+	 * find on element
+	 * 
+	 * @param client
+	 * @param body
+	 * @param klass
+	 * @return
+	 */
+	public <T> T create(WebTarget client, String body, Class<T> klass, String label) {
+		String classname = klass.getSimpleName();
+		return cypherOne(client,
+				"CREATE (" + classname + ":" + label + " " + body + ") RETURN " + classname + ",id(" + classname + ")",
+				klass);
 	}
 }

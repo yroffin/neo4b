@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package org.yroffin.neo4b.components;
+package org.yroffin.neo4b.exception;
 
 import java.io.IOException;
 
@@ -23,17 +23,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 /**
  * technical exception
  */
-public class TechnicalException extends RuntimeException {
+public class NotFoundException extends RuntimeException {
 
-	public TechnicalException(String message) {
+	public NotFoundException(String message) {
 		super(message);
 	}
 
-	public TechnicalException(JsonProcessingException e) {
+	public NotFoundException(JsonProcessingException e) {
 		super(e);
 	}
 
-	public TechnicalException(IOException e) {
+	public NotFoundException(IOException e) {
 		super(e);
 	}
 

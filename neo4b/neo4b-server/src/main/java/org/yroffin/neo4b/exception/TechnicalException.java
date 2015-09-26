@@ -14,20 +14,36 @@
  *   limitations under the License.
  */
 
-package org.yroffin.neo4b.model.rest.board;
+package org.yroffin.neo4b.exception;
 
-import java.util.Date;
+import java.io.IOException;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
-import lombok.Data;
-import lombok.Setter;
+/**
+ * technical exception
+ */
+public class TechnicalException extends RuntimeException {
 
-@Setter
-@Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class BoardRest {
-	String id;
-	String description;
-	Date timestamp;
+	public TechnicalException(String message) {
+		super(message);
+	}
+
+	public TechnicalException(JsonProcessingException e) {
+		super(e);
+	}
+
+	public TechnicalException(IOException e) {
+		super(e);
+	}
+
+	public TechnicalException(Exception e) {
+		super(e);
+	}
+
+	/**
+	 * default serial
+	 */
+	private static final long serialVersionUID = 1L;
+
 }

@@ -17,13 +17,11 @@
 package org.yroffin.neo4b.services;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.ws.rs.client.WebTarget;
 
 import org.springframework.stereotype.Component;
-import org.yroffin.neo4b.components.TechnicalException;
+import org.yroffin.neo4b.exception.TechnicalException;
 import org.yroffin.neo4b.model.rest.board.BoardRest;
 
 /**
@@ -32,10 +30,9 @@ import org.yroffin.neo4b.model.rest.board.BoardRest;
 @Component
 public class BoardResource extends DefaultResource {
 
-	WebTarget client;
-
 	@PostConstruct
-	void init() {
+	protected void init() {
+		super.init();
 		client = graphDbService.factory("http://192.168.1.12:7474", "neo4j", "123456");
 	}
 
@@ -47,10 +44,7 @@ public class BoardResource extends DefaultResource {
 	 * @throws IOException
 	 */
 	public String getBoards(String body, Class<BoardRest> klass) throws IOException {
-		if (body != null && body.length() > 0) {
-			mapper.readValue(body, klass);
-		}
-		return mapper.writeValueAsString(new BoardRest());
+		return mapperSpark.writeValueAsString(findAll(BoardRest.class, "Board", 100));
 	}
 
 	/**
@@ -62,11 +56,8 @@ public class BoardResource extends DefaultResource {
 	 */
 	public String createBoard(String body, Class<BoardRest> klass) throws IOException {
 		if (body != null && body.length() > 0) {
-			BoardRest board = mapper.readValue(body, klass);
-
-			List<BoardRest> response = graphDbService.findAll(client, BoardRest.class, 100);
-
-			return mapper.writeValueAsString(response);
+			BoardRest response = create(mapperNeo4j.readValue(body, klass), "Board");
+			return mapperSpark.writeValueAsString(response);
 		} else {
 			throw new TechnicalException("No data");
 		}

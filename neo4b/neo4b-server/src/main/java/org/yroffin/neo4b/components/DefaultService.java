@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yroffin.neo4b.exception.TechnicalException;
 
 /**
  * default service
