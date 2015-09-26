@@ -7,7 +7,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>neo4b-server</module>
-		<module>neo4j-board</module>
+		<module>neo4b-board</module>
 	</modules>
 
 	<properties>
