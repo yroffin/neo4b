@@ -28,13 +28,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.yroffin.neo4b.services.ResourceMapper;
+import org.yroffin.neo4b.services.IResourceMapper;
 
 @Component
 public class WebServerService extends DefaultService {
 
 	@Autowired
-	ResourceMapper resourceMapper;
+	IResourceMapper resourceMapper;
 
 	protected static final Logger logger = LoggerFactory.getLogger(WebServerService.class);
 	private static final String SERVER_PROPERTIES = "server.properties";

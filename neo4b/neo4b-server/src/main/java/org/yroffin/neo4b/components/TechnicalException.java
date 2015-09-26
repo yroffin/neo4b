@@ -16,6 +16,10 @@
 
 package org.yroffin.neo4b.components;
 
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 /**
  * technical exception
  */
@@ -23,6 +27,14 @@ public class TechnicalException extends RuntimeException {
 
 	public TechnicalException(String message) {
 		super(message);
+	}
+
+	public TechnicalException(JsonProcessingException e) {
+		super(e);
+	}
+
+	public TechnicalException(IOException e) {
+		super(e);
 	}
 
 	/**

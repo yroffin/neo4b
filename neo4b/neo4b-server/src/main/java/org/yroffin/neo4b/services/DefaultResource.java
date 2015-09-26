@@ -16,8 +16,17 @@
 
 package org.yroffin.neo4b.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.yroffin.neo4b.components.GraphDbService;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ma.glasnost.orika.MapperFactory;
+
 public class DefaultResource {
+	@Autowired
+	protected GraphDbService graphDbService;
+
+	protected MapperFactory mapperFactory;
 	protected ObjectMapper mapper = new ObjectMapper();
 }

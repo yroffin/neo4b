@@ -14,25 +14,17 @@
  *   limitations under the License.
  */
 
-package org.yroffin.neo4b;
+package org.yroffin.neo4b.model.rest.board;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import java.util.Date;
 
-/**
- * main application boot strap
- */
-public class BoardBootstrap {
-	private static final String CONFIG_PATH = "classpath*:application-config.xml";
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-	/**
-	 * main entry
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		final ApplicationContext context = new ClassPathXmlApplicationContext(CONFIG_PATH);
-		((AbstractApplicationContext) context).close();
-	}
+import lombok.Data;
+
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class BoardRest {
+	String id;
+	Date timestamp;
 }

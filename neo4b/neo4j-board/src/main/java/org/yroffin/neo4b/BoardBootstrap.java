@@ -13,23 +13,18 @@
  *  See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
-package org.yroffin.neo4b.services;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import org.springframework.stereotype.Component;
+package org.yroffin.neo4b;
 
 /**
- * resource mapper
+ * main application boot strap
  */
-@Component
-public abstract class ResourceMapper extends DefaultResource implements IResourceMapper {
-
-	/* (non-Javadoc)
-	 * @see org.yroffin.neo4b.services.IResourceMapper#map()
+public class BoardBootstrap {
+	/**
+	 * main entry
+	 * 
+	 * @param args
 	 */
-	@Override
-	public abstract void map() throws IOException, URISyntaxException;
+	public static void main(String[] args) {
+		Bootstrap.main(args);
+	}
 }

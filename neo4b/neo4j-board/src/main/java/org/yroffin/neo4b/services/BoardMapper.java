@@ -19,17 +19,31 @@ package org.yroffin.neo4b.services;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.yroffin.neo4b.model.rest.board.BoardRest;
 
 /**
  * resource mapper
  */
 @Component
-public abstract class ResourceMapper extends DefaultResource implements IResourceMapper {
+public class BoardMapper extends ResourceMapper implements IResourceMapper {
 
-	/* (non-Javadoc)
-	 * @see org.yroffin.neo4b.services.IResourceMapper#map()
-	 */
-	@Override
-	public abstract void map() throws IOException, URISyntaxException;
+	@Autowired
+	BoardResource boardResource;
+
+	public void map() throws IOException, URISyntaxException {
+		// GET
+		spark.Spark.get("/api/boardManagement/v1/boards", (request, response) -> {
+			response.type("application/json");
+			response.body(boardResource.getBoards(request.body(), BoardRest.class));
+			return response.body();
+		});
+		// POST
+		spark.Spark.post("/api/boardManagement/v1/boards", (request, response) -> {
+			response.type("application/json");
+			response.body(boardResource.createBoard(request.body(), BoardRest.class));
+			return response.body();
+		});
+	}
 }

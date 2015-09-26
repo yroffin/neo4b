@@ -17,14 +17,14 @@
 package org.yroffin.neo4b.services;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.ws.rs.client.WebTarget;
 
 import org.springframework.stereotype.Component;
+import org.yroffin.neo4b.components.TechnicalException;
 import org.yroffin.neo4b.model.rest.board.BoardRest;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 
 /**
  * resource mapper
@@ -32,9 +32,11 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 @Component
 public class BoardResource extends DefaultResource {
 
+	WebTarget client;
+
 	@PostConstruct
 	void init() {
-		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+		client = graphDbService.factory("http://192.168.1.12:7474", "neo4j", "123456");
 	}
 
 	/**
@@ -44,10 +46,29 @@ public class BoardResource extends DefaultResource {
 	 * @return
 	 * @throws IOException
 	 */
-	public Object boards(String body, Class<BoardRest> klass) throws IOException {
+	public String getBoards(String body, Class<BoardRest> klass) throws IOException {
 		if (body != null && body.length() > 0) {
 			mapper.readValue(body, klass);
 		}
 		return mapper.writeValueAsString(new BoardRest());
+	}
+
+	/**
+	 * get all boards
+	 * 
+	 * @param board
+	 * @return
+	 * @throws IOException
+	 */
+	public String createBoard(String body, Class<BoardRest> klass) throws IOException {
+		if (body != null && body.length() > 0) {
+			BoardRest board = mapper.readValue(body, klass);
+
+			List<BoardRest> response = graphDbService.findAll(client, BoardRest.class, 100);
+
+			return mapper.writeValueAsString(response);
+		} else {
+			throw new TechnicalException("No data");
+		}
 	}
 }
