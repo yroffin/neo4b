@@ -18,6 +18,8 @@ package org.yroffin.neo4b.services;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,17 +35,34 @@ public class BoardMapper extends ResourceMapper implements IResourceMapper {
 	BoardResource boardResource;
 
 	public void map() throws IOException, URISyntaxException {
+
 		// GET
 		spark.Spark.get("/api/boardManagement/v1/boards", (request, response) -> {
 			response.type("application/json");
 			response.body(boardResource.getBoards(request.body(), BoardRest.class));
 			return response.body();
 		});
+
 		// POST
 		spark.Spark.post("/api/boardManagement/v1/boards", (request, response) -> {
 			response.type("application/json");
 			response.body(boardResource.createBoard(request.body(), BoardRest.class));
 			return response.body();
+		});
+
+		// Static
+		// Spark.staticFileLocation("public");
+
+		spark.Spark.get("*", (request, response) -> {
+			String path = request.pathInfo();
+			if (path.compareTo("/") == 0) {
+				path = "/index.html";
+			}
+			String content = new String(Files.readAllBytes(Paths.get("src/main/resources/public" + path)));
+			if (path.endsWith(".css")) {
+				response.type("text/css");
+			}
+			return content;
 		});
 	}
 }
