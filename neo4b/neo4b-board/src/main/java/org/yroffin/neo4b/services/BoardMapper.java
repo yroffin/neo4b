@@ -50,6 +50,18 @@ public class BoardMapper extends ResourceMapper implements IResourceMapper {
 			return response.body();
 		});
 
+		// DELETE
+		spark.Spark.delete("/api/boardManagement/v1/boards/:id", (request, response) -> {
+			response.type("application/json");
+			try {
+				response.body(boardResource.deleteBoard(request.params(":id"), BoardRest.class));
+			} catch (org.yroffin.neo4b.exception.NotFoundException e) {
+				response.body("{}");
+				response.status(404);
+			}
+			return response.body();
+		});
+
 		// Static
 		// Spark.staticFileLocation("public");
 

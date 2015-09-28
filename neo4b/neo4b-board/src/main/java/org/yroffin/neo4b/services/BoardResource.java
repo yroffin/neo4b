@@ -48,6 +48,19 @@ public class BoardResource extends DefaultResource {
 	}
 
 	/**
+	 * delete board
+	 * 
+	 * @param id
+	 * @param klass
+	 * @return
+	 * @throws IOException
+	 */
+	public String deleteBoard(String id, Class<BoardRest> klass) throws IOException {
+		BoardRest response = deleteById(id, klass);
+		return mapperSpark.writeValueAsString(response);
+	}
+
+	/**
 	 * get all boards
 	 * 
 	 * @param board

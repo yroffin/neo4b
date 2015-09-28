@@ -74,6 +74,23 @@ public class DefaultResource {
 	}
 
 	/**
+	 * delete
+	 * 
+	 * @param id
+	 * @param klass
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	protected <T> T deleteById(String id, Class<T> value) {
+		try {
+			return graphDbService.delete(client, id, mapperNeo4j.writeValueAsString(value), (Class<T>) value);
+		} catch (JsonProcessingException e) {
+			logger.error("Error {}", e);
+			throw new TechnicalException(e);
+		}
+	}
+
+	/**
 	 * create node
 	 * 
 	 * @param body

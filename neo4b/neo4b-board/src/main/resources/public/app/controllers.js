@@ -93,7 +93,7 @@ angular.module('BoardApp',['ngMaterial', 'ngMdIcons', 'ngRoute', 'ngSanitize', '
      */
     .controller('BoardsCtrl',
     ['$scope', '$mdToast', 'RestBoards', function($scope, $mdToast, RestBoards){
-        RestBoards.boards({}, function(data) {
+        RestBoards.findAll({}, function(data) {
             $scope.working.boards = data;
             console.info(data);
             $mdToast.show(
@@ -110,6 +110,32 @@ angular.module('BoardApp',['ngMaterial', 'ngMdIcons', 'ngRoute', 'ngSanitize', '
                     .hideDelay(3000).theme("failure-toast")
             );
         });
+
+        /**
+         * select a single ne page and route browser on it
+         */
+        $scope.delete = function(board) {
+            RestBoards.delete({id:board.id}, function(data) {
+                $mdToast.show(
+                    $mdToast.simple()
+                        .content(board.title)
+                        .position($scope.getToastPosition())
+                        .hideDelay(3000)
+                );
+                /**
+                 * delete on client side
+                 */
+                var index = $scope.working.boards.indexOf(board);
+                $scope.working.boards.splice(board, 1); 
+            }, function(failure) {
+                $mdToast.show(
+                    $mdToast.simple()
+                        .content(failure)
+                        .position($scope.getToastPosition())
+                        .hideDelay(3000).theme("failure-toast")
+                );
+            });
+        }
 
         /**
          * select a single ne page and route browser on it

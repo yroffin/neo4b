@@ -32,7 +32,7 @@ myAppServices.factory('RestBoards', [ '$resource', function($resource, $windows)
 			/**
 			 * get boards collection
 			 */
-			boards: {
+			findAll: {
 				method: 'GET',
 				url: restApiUrl + '/boardManagement/v1/boards',
 				params: {},
@@ -42,8 +42,17 @@ myAppServices.factory('RestBoards', [ '$resource', function($resource, $windows)
 			/**
 			 * get single board by id
 			 */
-			board: {
+			get: {
 				method: 'GET',
+				url: restApiUrl + '/boardManagement/v1/boards/:id',
+				isArray: false,
+				cache: false
+			},
+			/**
+			 * get single board by id
+			 */
+			delete: {
+				method: 'DELETE',
 				url: restApiUrl + '/boardManagement/v1/boards/:id',
 				isArray: false,
 				cache: false
@@ -51,7 +60,7 @@ myAppServices.factory('RestBoards', [ '$resource', function($resource, $windows)
 			/**
 			 * create single board
 			 */
-			board: {
+			create: {
 				method: 'POST',
 				url: restApiUrl + '/boardManagement/v1/boards',
 				isArray: false,

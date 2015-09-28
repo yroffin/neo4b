@@ -287,8 +287,10 @@ public class GraphDbService extends DefaultService {
 	 * @return
 	 */
 	public <T> List<T> findAll(WebTarget client, Class<T> klass, String label, int limit) {
-		return cypherFind(client, "MATCH (" + klass.getSimpleName() + ":" + label + ") RETURN " + klass.getSimpleName()
-				+ " LIMIT " + limit, klass);
+		String classname = klass.getSimpleName();
+		return cypherFind(client,
+				"MATCH (" + classname + ":" + label + ") RETURN " + classname + ",id(" + classname + ") LIMIT " + limit,
+				klass);
 	}
 
 	/**
@@ -304,5 +306,25 @@ public class GraphDbService extends DefaultService {
 		return cypherOne(client,
 				"CREATE (" + classname + ":" + label + " " + body + ") RETURN " + classname + ",id(" + classname + ")",
 				klass);
+	}
+
+	/**
+	 * delete node
+	 * 
+	 * @param client
+	 * @param id
+	 * @param body
+	 * @param klass
+	 * @return
+	 */
+	public <T> T delete(WebTarget client, String id, String body, Class<T> klass) {
+		String classname = klass.getSimpleName();
+		// Retrieve existing element
+		T one = cypherOne(client, "MATCH (" + classname + ") WHERE id(" + classname + ") = " + id + " RETURN "
+				+ classname + ",id(" + classname + ")", klass);
+		// Delete it
+		cypherFind(client, "MATCH (" + classname + ") WHERE id(" + classname + ") = " + id + " OPTIONAL MATCH ("
+				+ classname + ")-[rel]->() DELETE " + classname + ",rel", klass);
+		return one;
 	}
 }
