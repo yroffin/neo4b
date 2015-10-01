@@ -80,7 +80,6 @@ public class DefaultResource {
 	 * @param klass
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	protected <T> T deleteById(String id, Class<T> value) {
 		try {
 			return graphDbService.delete(client, id, mapperNeo4j.writeValueAsString(value), (Class<T>) value);

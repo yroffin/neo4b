@@ -23,8 +23,8 @@ angular.module('BoardApp',['ngMaterial', 'ngMdIcons', 'ngRoute', 'ngSanitize', '
      * main controller
      */
     .controller('RootCtrl',
-    ['$scope', '$mdSidenav', '$location', '$mdBottomSheet', '$window', '$mdDialog', 'BoardServices',
-     function($scope, $mdSidenav, $location, $mdBottomSheet, $window, $mdDialog, BoardServices){
+    ['$scope', '$mdSidenav', '$location', '$mdBottomSheet', '$window', '$mdDialog', 'ToastServices', 'BoardServices',
+     function($scope, $mdSidenav, $location, $mdBottomSheet, $window, $mdDialog, ToastServices, BoardServices){
         /**
          * initialize configuration
          */
@@ -92,48 +92,87 @@ angular.module('BoardApp',['ngMaterial', 'ngMdIcons', 'ngRoute', 'ngSanitize', '
      * posts controller
      */
     .controller('BoardsCtrl',
-    ['$scope', '$mdToast', 'RestBoards', function($scope, $mdToast, RestBoards){
+    ['$scope', '$mdDialog', '$mdToast', 'ToastServices', 'RestBoards', '$log', function($scope, $mdDialog, $mdToast, toast, RestBoards, $log){
         RestBoards.findAll({}, function(data) {
             $scope.working.boards = data;
-            console.info(data);
-            $mdToast.show(
-                $mdToast.simple()
-                    .content(data.length + " board(s)")
-                    .position($scope.getToastPosition())
-                    .hideDelay(3000)
-            );
+            toast.display(data.length + " board(s)");
         }, function(failure) {
-            $mdToast.show(
-                $mdToast.simple()
-                    .content(failure)
-                    .position($scope.getToastPosition())
-                    .hideDelay(3000).theme("failure-toast")
-            );
+            toast.display(failure, true);
         });
 
         /**
-         * select a single ne page and route browser on it
+         * delete current selected board
          */
         $scope.delete = function(board) {
             RestBoards.delete({id:board.id}, function(data) {
-                $mdToast.show(
-                    $mdToast.simple()
-                        .content(board.title)
-                        .position($scope.getToastPosition())
-                        .hideDelay(3000)
-                );
+                toast.display("Board " + data.id + " deleted");
                 /**
                  * delete on client side
                  */
                 var index = $scope.working.boards.indexOf(board);
                 $scope.working.boards.splice(board, 1); 
             }, function(failure) {
-                $mdToast.show(
-                    $mdToast.simple()
-                        .content(failure)
-                        .position($scope.getToastPosition())
-                        .hideDelay(3000).theme("failure-toast")
-                );
+                toast.display(failure, true);
+            });
+        }
+        
+        /**
+         * dialog for item creation
+         */
+        $scope.showCreateBoard = function() {
+            // Default values
+            $scope.createBoard = {
+                values : {
+                    name:"default name",
+                    description:"default description"
+                }
+            };
+            // Dialog creation
+            $mdDialog.show({
+              scope: $scope,                                            // use parent scope in template
+              preserveScope: true,
+              controller: function($scope, $mdDialog) {
+                  $scope.hide = function() {
+                    $mdDialog.hide();
+                  };
+                  $scope.cancel = function() {
+                    $mdDialog.cancel();
+                  };
+                  $scope.validate = function(validated) {
+                      if(!validated) {
+                          $scope.createBoard = undefined;
+                          $mdDialog.cancel();
+                      } else {
+                          $mdDialog.hide();
+                      }
+                  };
+              },
+              templateUrl: 'partials/dialog/board.html',
+              parent: angular.element(document.body),
+              clickOutsideToClose:true
+            })
+            .then(function(answer) {
+              $log.debug('Accept:', $scope.createBoard.values);
+              $scope.create($scope.createBoard.values);
+            }, function() {
+              $log.debug('You cancelled the creation');
+            });
+        };
+
+        /**
+         * create current selected board
+         */
+        $scope.create = function(board) {
+            // Create new entity
+            RestBoards.create(board, function(data) {
+                /**
+                 * create on client side
+                 */
+                $scope.working.boards.push(data);
+                toast.display(data.name);
+                $log.debug('Push new board', data);
+            }, function(failure) {
+                toast.display("Unable to create new board",true);
             });
         }
 
@@ -142,20 +181,10 @@ angular.module('BoardApp',['ngMaterial', 'ngMdIcons', 'ngRoute', 'ngSanitize', '
          */
         $scope.select = function(board) {
             RestBoards.board({id:board.id}, function(data) {
-                $mdToast.show(
-                    $mdToast.simple()
-                        .content(board.title)
-                        .position($scope.getToastPosition())
-                        .hideDelay(3000)
-                );
+                toast.display(data.name);
                 $scope.location("/boards/" + board.id);
             }, function(failure) {
-                $mdToast.show(
-                    $mdToast.simple()
-                        .content(failure)
-                        .position($scope.getToastPosition())
-                        .hideDelay(3000).theme("failure-toast")
-                );
+                toast.display(failure, true);
             });
         }
     }])

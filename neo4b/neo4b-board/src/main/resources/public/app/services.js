@@ -86,3 +86,52 @@ myAppServices.factory('BoardServices', function() {
   };
   return services;
 });
+
+/**
+ * BoardServices
+ */
+myAppServices.factory('ToastServices', [ '$mdToast', '$log', function($mdToast, $log) {
+  var toastPosition = 
+        /**
+         * toast position
+         */
+        {
+            bottom: false,
+            top: true,
+            left: true,
+            right: false
+        };
+  var services = {
+        /**
+         * find toast position
+         */
+        getToastPosition: function() {
+            return Object.keys(toastPosition)
+                .filter(function(pos) { return toastPosition[pos]; })
+                .join(' ');
+        },
+        /**
+         * display toast
+         */
+        display: function(text, failure) {
+            if(failure === undefined) {
+                $log.info(text);
+                $mdToast.show(
+                      $mdToast.simple()
+                        .content(text)
+                        .position(this.getToastPosition())
+                        .hideDelay(3000)
+                );
+            } else {
+                $log.error(text);
+                $mdToast.show(
+                      $mdToast.simple()
+                        .content(text)
+                        .position(this.getToastPosition())
+                        .hideDelay(3000).theme('failure-toast')
+                );
+            }
+        }
+  };
+  return services;
+}]);

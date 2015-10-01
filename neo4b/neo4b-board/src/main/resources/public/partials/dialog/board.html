@@ -1,0 +1,25 @@
+<md-dialog>
+  <form>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2>Create a new board</h2>
+      <span flex></span>
+      <md-button class="md-icon-button" ng-click="cancel()">
+        <ng-md-icon icon="close" style="fill:grey" size="32" aria-label="Close dialog"></ng-md-icon>
+      </md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content>
+    <md-input-container>
+        <label>Name</label>
+        <input ng-model="createBoard.values.name">
+    </md-input-container>
+    <md-input-container>
+        <label>Title</label>
+        <input ng-model="createBoard.values.description">
+    </md-input-container>
+    <md-button ng-click="validate(false)">cancel</md-button>
+    <md-button ng-click="validate(true)">validate</md-button>
+   </md-dialog-content>
+    </form>
+</md-dialog>

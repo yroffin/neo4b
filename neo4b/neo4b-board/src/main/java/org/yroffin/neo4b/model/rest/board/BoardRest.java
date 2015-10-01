@@ -28,6 +28,7 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BoardRest {
 	String id;
+	String name;
 	String description;
 	Date timestamp;
 }

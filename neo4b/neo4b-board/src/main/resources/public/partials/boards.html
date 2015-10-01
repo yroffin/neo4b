@@ -1,7 +1,8 @@
 <md-content>
     <md-list>
-          <md-subheader class="md-no-sticky">3 line item</md-subheader>
-          <md-list-item class="md-3-line" ng-repeat="item in working.boards">
+        <md-subheader class="md-no-sticky">{{working.boards.length}} board(s)</md-subheader>
+        <ng-md-icon icon="create" style="fill:grey" size="32" ng-click="showCreateBoard($event)"></ng-md-icon>
+        <md-list-item class="md-3-line" ng-repeat="item in working.boards">
             <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />
             <div class="md-list-item-text" layout="column">
               <h3>{{item.name}} - {{item.id}}</h3>
